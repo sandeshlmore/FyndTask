@@ -13,19 +13,31 @@ movies_blueprint = Blueprint('movies_blueprint', __name__)
 
 
 class Movies(Resource):
-    def get(self):
-        filters = eval(request.args.get('filters', {}))  ## {'genre':['Comedy', 'Drama']}
-        page_no = int(request.args.get('page_no', 1))
-        per_page = int(request.args.get('per_page', 10))
-        search_string = eval(request.args.get('search_string', 'None'))
-        sort = eval(request.args.get('sorting', 'None'))
+    '''
+        Provides CRUD operations on movies
+    '''
 
-        print('search_string')
-        print(search_string)
-        movies = get_movies(filters, search_string, sort, page_no, per_page)
-        return make_response(
-            jsonify({'status': API_SUCCESS_STATUS, 'message': 'MOVIES_RETRIEVED_SUCCESSFULLY', 'data': movies}),
-            200)
+    def get(self):
+        '''
+            search_string: Search movie by name
+            filters: Filter movie by genre, director, ratings, etc.  e.g. {'genre':['Comedy', 'Drama']}
+            page_no: current page number defaults to 1
+            per_page: maximum records per page defaults to 10 records
+            sorting: defaults to {'sort_on': 'imdb_score', 'ascending': 1}
+            :return:
+        '''
+        try:
+            filters = eval(request.args.get('filters', '{}'))
+            page_no = int(request.args.get('page_no', 1))
+            per_page = int(request.args.get('per_page', 10))
+            search_string = eval(request.args.get('search_string', 'None'))
+            sort = eval(request.args.get('sorting', 'None'))
+            movies = get_movies(filters, search_string, sort, page_no, per_page)
+            return make_response(
+                jsonify({'status': API_SUCCESS_STATUS, 'message': 'MOVIES_RETRIEVED_SUCCESSFULLY', 'data': movies}),
+                200)
+        except Exception as e:
+            return make_response(jsonify({'status': API_ERROR_STATUS, 'errors': str(e)}), 500)
 
 
     @jwt_required
@@ -33,7 +45,7 @@ class Movies(Resource):
     def post(self):
         is_add = request.json.get('is_add', False)
         is_edit = request.json.get('is_edit', False)
-        is_get = request.json.get('is_get', False)
+        is_get = request.json.get('is_get', False) ##I like to use POST for everything!
         is_delete = request.json.get('is_delete', False)
 
         try:
@@ -42,23 +54,32 @@ class Movies(Resource):
             #     return make_response(jsonify(
             #         {'status': API_SUCCESS_STATUS, 'message': 'ACTION_NOT_ALLOWED_TO_NON_ADMIN_USER'}), 200)
             if is_edit:
-                movie_update = request.json.get('movie_update')
+                '''
+                    ##Edit movie
+                    movie: dictionary object with '_id' field of type string(24-bytes long) mandatory
+                '''
+
+                movie_update = request.json.get('movie') #movie object
                 movie_id = movie_update.get('_id') ##TODO: validate movie schema
 
                 if (not isinstance(movie_id, str)) or (bson.objectid.ObjectId.is_valid(movie_id)):
                     return make_response(
-                        jsonify({'status': API_SUCCESS_STATUS, 'message': 'INVALID_MOVIE_ID', '_id': movie_id}),
+                        jsonify({'status': API_SUCCESS_STATUS, 'message': 'INVALID_MOVIE_ID'}),
                         200)
                 result = edit_movie(movie_id, movie_update)
                 if result.raw_result.get('updatedExisting', False):
                     return make_response(jsonify(
-                        {'status': API_SUCCESS_STATUS, 'message': 'MOVIE_EDITED_SUCCESSFULLY', '_id': movie_id}), 200)
+                        {'status': API_SUCCESS_STATUS, 'message': 'MOVIE_EDITED_SUCCESSFULLY'}), 200)
                 else:
                     return make_response(jsonify(
-                        {'status': API_SUCCESS_STATUS, 'message': 'MOVIE_UPDATE_OPERATION_FAILED', '_id': movie_id}),
+                        {'status': API_SUCCESS_STATUS, 'message': 'MOVIE_UPDATE_OPERATION_FAILED'}),
                         200)
 
             elif is_delete:
+                '''
+                    #delete movie
+                    movie_id: string(24-bytes long)
+                '''
                 movie_id = request.json.get('movie_id')
 
                 if (not isinstance(movie_id, str)) or (bson.objectid.ObjectId.is_valid(movie_id)):
@@ -75,8 +96,13 @@ class Movies(Resource):
                         200)
 
             elif is_add:
+                '''
+                    #Add new movie
+                    movie: dictionary object with 'name' field mandatory
+                '''
                 movie = request.json.get('movie') ##TODO: validate movie schema
-                if not isinstance(movie, dict):
+
+                if not isinstance(movie, dict) or 'name' not in movie or bool(movie['name']):
                     return make_response(
                         jsonify({'status': API_SUCCESS_STATUS, 'message': 'INVALID_MOVIE_SCHEMA', '_id': movie}),
                         200)
@@ -90,6 +116,7 @@ class Movies(Resource):
                 else:
                     return make_response(jsonify(
                         {'status': API_SUCCESS_STATUS, 'message': 'MOVIE_INSERT_OPERATION_FAILED', 'data': movie}), 200)
+
             elif is_get:
                 filters = request.json.get('filters', {})  ## {'genre':['Comedy', 'Drama']}
                 page_no = request.json.get('page_no', 1)
@@ -102,8 +129,8 @@ class Movies(Resource):
                     200)
 
         except Exception as e:
-            import traceback
-            traceback.print_exc()
+            # import traceback
+            # traceback.print_exc()
             return make_response(jsonify({'status': API_ERROR_STATUS, 'errors': str(e)}), 500)
 
 

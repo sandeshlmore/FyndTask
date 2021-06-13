@@ -6,3 +6,7 @@ gen
 __pycache__
 /*.zip
 /dev_env
+flask-app-secrets.yaml
+flask-deployment.yaml
+flask-ingress.yaml
+heroku.yml
