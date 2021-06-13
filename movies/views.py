@@ -101,7 +101,7 @@ class Movies(Resource):
                 '''
                 movie = request.json.get('movie') ##TODO: validate movie schema
 
-                if not isinstance(movie, dict) or 'name' not in movie or bool(movie['name']):
+                if not isinstance(movie, dict) or 'name' not in movie or not bool(movie['name']):
                     return make_response(
                         jsonify({'status': API_SUCCESS_STATUS, 'message': 'INVALID_MOVIE_SCHEMA', '_id': movie}),
                         200)
