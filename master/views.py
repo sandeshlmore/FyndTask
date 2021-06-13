@@ -32,7 +32,7 @@ def check_if_token_in_blacklist(decrypted_token):
 
 def is_jti_blacklisted(jti):
     try:
-        response = mongo.db.blacklisted_tokens.find_one({'jti': jti})
+        response = db.blacklisted_tokens.find_one({'jti': jti})
         return bool(response)
     except Exception as e:
         app.logger.error(str(e))
