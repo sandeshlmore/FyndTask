@@ -19,10 +19,10 @@ class Movies(Resource):
 
     def get(self):
         '''
-            search_string: Search movie by name
+            search_string: Search movie by name (case insensitive and returns records with partial matches)
             filters: Filter movie by genre, director, ratings, etc.  e.g. {'genre':['Comedy', 'Drama']}
             page_no: current page number defaults to 1
-            per_page: maximum records per page defaults to 10 records
+            per_page: maximum records per page defaults to 10 records  [set to 0 for retrieving all records]
             sorting: defaults to {'sort_on': 'imdb_score', 'ascending': 1}
             :return:
         '''
@@ -43,12 +43,12 @@ class Movies(Resource):
     @jwt_required
     @check_admin_access
     def post(self):
-        is_add = request.json.get('is_add', False)
-        is_edit = request.json.get('is_edit', False)
-        is_get = request.json.get('is_get', False) ##I like to use POST for everything!
-        is_delete = request.json.get('is_delete', False)
-
         try:
+            is_add = request.json.get('is_add', False)
+            is_edit = request.json.get('is_edit', False)
+            is_get = request.json.get('is_get', False) ##I like to use POST for everything!
+            is_delete = request.json.get('is_delete', False)
+
             # has_admin_access = check_admin_access()
             # if not has_admin_access:
             #     return make_response(jsonify(
@@ -58,7 +58,6 @@ class Movies(Resource):
                     ##Edit movie
                     movie: dictionary object with '_id' field of type string(24-bytes long) mandatory
                 '''
-
                 movie_update = request.json.get('movie') #movie object
                 movie_id = movie_update.get('_id') ##TODO: validate movie schema
 
@@ -77,7 +76,7 @@ class Movies(Resource):
 
             elif is_delete:
                 '''
-                    #delete movie
+                    #delete movie  (HARD DELETE)
                     movie_id: string(24-bytes long)
                 '''
                 movie_id = request.json.get('movie_id')

@@ -18,6 +18,10 @@ class MongoJsonEncoder(JSONEncoder):
 
 
 def check_admin_access(fn):
+    '''
+        decorator to check if user has admin access or not
+        "is_admin" key is added to JWT token when user logs in using login Api
+    '''
     @wraps(fn)
     def wrapper(*args, **kwargs):
         current_user = get_jwt_identity()
@@ -26,7 +30,7 @@ def check_admin_access(fn):
         # print(current_user)
         # print('user_claims')
         # print(user_claims)
-        ##TODO: when the user access level is changed need to blacklist the tokens of the user
+        ##TODO: when the user access level is changed need to blacklist the token of the user
         if user_claims.get('is_admin'):
             return fn(*args, **kwargs)
         else:

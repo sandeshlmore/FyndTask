@@ -1,0 +1,18 @@
+This is flask-rest-api design for crud operations on movies collection (MongoDB database)
+
+GET operation is allowed to all users
+
+ADD, EDIT and DELTE operations are only allowed to admin users
+
+
+
+#Deployment:
+docker build -t gcr.io/<project-name>/flask-app:v0.2 .
+
+docker push gcr.io/<project-name>/flask-app:v0.1
+
+kubectl apply -f flask-app-secrets.yaml
+
+kubectl apply -f flask-app-deployment.yaml
+
+kubectl expose deployment flask-app --type=LoadBalancer --port 80 --target-port 80

@@ -23,6 +23,12 @@ class User(object):
 
 
 class Login(Resource):
+    '''
+        #Provides accessToken(for 15min) and RefreshToken(24 mins) for using protected Apis
+        email: user email id
+        password: user password
+
+    '''
     def post(self):
         email = request.json.get('email', None)
         password = request.json.get('password', None)
@@ -51,6 +57,9 @@ class Login(Resource):
 
 
 class TokenRefresh(Resource):
+    '''
+        #Gernerate new access token using existing refresh token
+    '''
     @jwt_refresh_token_required
     def post(self):
         try:
@@ -68,6 +77,7 @@ class TokenRefresh(Resource):
         
         
 class HealthCheck(Resource):
+
     def get(self):
         return make_response(jsonify({'status': 'OK'}), 200)
 
