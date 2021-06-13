@@ -3,13 +3,13 @@ import datetime
 import bcrypt
 from flask import request, make_response, jsonify, Blueprint
 from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity, get_jwt_claims, \
-    jwt_refresh_token_required
+    jwt_refresh_token_required, get_jti
 from flask_restful import Resource
 
 from common.constants import JWT_REFRESH_TOKEN_TIMEDELTA, JWT_ACCESS_TOKEN_TIMEDELTA, API_SUCCESS_STATUS, \
     API_ERROR_STATUS
 from master.views import api, db, app
-from user.controller import user_login
+from user.controller import user_login, blacklist_token
 
 user_blueprint = Blueprint('user_blueprint', __name__)
 
@@ -49,6 +49,22 @@ class Login(Resource):
         refresh_token = create_refresh_token(identity=user.get('email'),
                                              user_claims=user_claims,
                                              expires_delta=JWT_REFRESH_TOKEN_TIMEDELTA)
+
+        # blacklist old access_token refresh_token tokens
+        old_access_token = user.get('access_token', '')
+        old_refresh_token = user.get('refresh_token', '')
+        try:
+            old_access_token_jti = get_jti(old_access_token)
+            old_refresh_token_jti = get_jti(old_refresh_token)
+            if old_access_token:
+                blacklist_token(old_access_token_jti)
+                app.logger.debug('old_access_token blacklisted')
+            if old_refresh_token:
+                blacklist_token(old_refresh_token_jti)
+                app.logger.debug('old_refresh_token blacklisted')
+        except Exception as e:
+            app.logger.debug(e)
+
         db.users.update({'email': email}, {'$set': {'access_token': access_token, 'refresh_token': refresh_token,
                                                     'last_logged_in': datetime.datetime.now()}})
 

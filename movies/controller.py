@@ -3,7 +3,7 @@ from bson import ObjectId
 from master.views import db
 
 
-def get_movies(filters, search_string=None, sort=None, page_no=1, per_page=0):
+def get_movies(filters, search_string=None, sort_on='imdb_score', ascending=1, page_no=1, per_page=0):
     start_index = (page_no - 1) * per_page
     end_index = per_page
     query_filters = {}
@@ -11,12 +11,11 @@ def get_movies(filters, search_string=None, sort=None, page_no=1, per_page=0):
         query_filters['name'] = {'$regex': str(search_string), '$options':'i'}
     if 'genre' in filters:
         query_filters['genre'] = {'$in': filters['genre']}
-    if not sort:
-        sort = {'sort_on': 'imdb_score', 'ascending': 1}
+
     if not query_filters and filters:
         query_filters = filters
 
-    movies = list(db.movies.find({**query_filters}).sort([(sort.get('sort_on'), sort.get('ascending'))]).skip(start_index).limit(end_index))
+    movies = list(db.movies.find({**query_filters}).sort([(sort_on, ascending)]).skip(start_index).limit(end_index))
     total_results = db.movies.find({**query_filters}).count()
 
     return {'movies': movies, 'total_results': total_results}

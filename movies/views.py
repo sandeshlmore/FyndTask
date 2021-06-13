@@ -23,16 +23,18 @@ class Movies(Resource):
             filters: Filter movie by genre, director, ratings, etc.  e.g. {'genre':['Comedy', 'Drama']}
             page_no: current page number defaults to 1
             per_page: maximum records per page defaults to 10 records  [set to 0 for retrieving all records]
-            sorting: defaults to {'sort_on': 'imdb_score', 'ascending': 1}
-            :return:
+            sort_on: 'imdb_score'
+            ascending: 1 or -1 (for descending)
         '''
         try:
             filters = eval(request.args.get('filters', '{}'))
             page_no = int(request.args.get('page_no', 1))
             per_page = int(request.args.get('per_page', 10))
             search_string = eval(request.args.get('search_string', 'None'))
-            sort = eval(request.args.get('sorting', 'None'))
-            movies = get_movies(filters, search_string, sort, page_no, per_page)
+            # sort = eval(request.args.get('sorting', 'None'))
+            sort_on = request.args.get('sort_on', 'None')
+            ascending = request.args.get('ascending', 1)
+            movies = get_movies(filters, search_string, sort_on, ascending, page_no, per_page)
             return make_response(
                 jsonify({'status': API_SUCCESS_STATUS, 'message': 'MOVIES_RETRIEVED_SUCCESSFULLY', 'data': movies}),
                 200)
@@ -46,7 +48,7 @@ class Movies(Resource):
         try:
             is_add = request.json.get('is_add', False)
             is_edit = request.json.get('is_edit', False)
-            is_get = request.json.get('is_get', False) ##I like to use POST for everything!
+            # is_get = request.json.get('is_get', False) ##I like to use POST for everything!
             is_delete = request.json.get('is_delete', False)
 
             # has_admin_access = check_admin_access()
@@ -116,16 +118,16 @@ class Movies(Resource):
                     return make_response(jsonify(
                         {'status': API_SUCCESS_STATUS, 'message': 'MOVIE_INSERT_OPERATION_FAILED', 'data': movie}), 200)
 
-            elif is_get:
-                filters = request.json.get('filters', {})  ## {'genre':['Comedy', 'Drama']}
-                page_no = request.json.get('page_no', 1)
-                per_page = request.json.get('per_page', 10)
-                search_string = request.json.get('search_string', None)
-                sort = request.json.get('sorting', None)
-                movies = get_movies(filters, search_string, sort, page_no, per_page)
-                return make_response(
-                    jsonify({'status': API_SUCCESS_STATUS, 'message': 'MOVIES_RETRIEVED_SUCCESSFULLY', 'data': movies}),
-                    200)
+            # elif is_get:
+            #     filters = request.json.get('filters', {})  ## {'genre':['Comedy', 'Drama']}
+            #     page_no = request.json.get('page_no', 1)
+            #     per_page = request.json.get('per_page', 10)
+            #     search_string = request.json.get('search_string', None)
+            #     sort = request.json.get('sorting', None)
+            #     movies = get_movies(filters, search_string, sort, page_no, per_page)
+            #     return make_response(
+            #         jsonify({'status': API_SUCCESS_STATUS, 'message': 'MOVIES_RETRIEVED_SUCCESSFULLY', 'data': movies}),
+            #         200)
 
         except Exception as e:
             # import traceback
