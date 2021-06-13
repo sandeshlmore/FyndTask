@@ -23,11 +23,13 @@ def get_movies(filters, search_string=None, sort=None, page_no=1, per_page=0):
 
 
 def edit_movie(movie_id, movie):
+    if '_id' in movie:
+        del movie['_id']
     return db.movies.update_one({'_id': ObjectId(movie_id)}, {'$set': {**movie}})
 
 
 def delete_movie(movie_id):
-    return db.testing.delete_one({'_id': ObjectId(movie_id)})
+    return db.movies.delete_one({'_id': ObjectId(movie_id)})
 
 
 def add_movie(movie):
