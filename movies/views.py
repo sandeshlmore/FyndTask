@@ -33,7 +33,7 @@ class Movies(Resource):
             search_string = eval(request.args.get('search_string', 'None'))
             # sort = eval(request.args.get('sorting', 'None'))
             sort_on = request.args.get('sort_on', 'imdb_score')
-            ascending = request.args.get('ascending', 1)
+            ascending = eval(request.args.get('ascending', 1))
             movies = get_movies(filters, search_string, sort_on, ascending, page_no, per_page)
             return make_response(
                 jsonify({'status': API_SUCCESS_STATUS, 'message': 'MOVIES_RETRIEVED_SUCCESSFULLY', 'data': movies}),
