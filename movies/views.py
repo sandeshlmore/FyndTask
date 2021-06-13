@@ -61,7 +61,7 @@ class Movies(Resource):
                 movie_update = request.json.get('movie') #movie object
                 movie_id = movie_update.get('_id') ##TODO: validate movie schema
 
-                if (not isinstance(movie_id, str)) or (bson.objectid.ObjectId.is_valid(movie_id)):
+                if (not isinstance(movie_id, str)) or (not bson.objectid.ObjectId.is_valid(movie_id)):
                     return make_response(
                         jsonify({'status': API_SUCCESS_STATUS, 'message': 'INVALID_MOVIE_ID'}),
                         200)
@@ -81,7 +81,7 @@ class Movies(Resource):
                 '''
                 movie_id = request.json.get('movie_id')
 
-                if (not isinstance(movie_id, str)) or (bson.objectid.ObjectId.is_valid(movie_id)):
+                if (not isinstance(movie_id, str)) or (not bson.objectid.ObjectId.is_valid(movie_id)):
                     return make_response(
                         jsonify({'status': API_SUCCESS_STATUS, 'message': 'INVALID_MOVIE_ID', '_id': movie_id}),
                         200)
