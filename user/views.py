@@ -100,3 +100,4 @@ class HealthCheck(Resource):
 
 api.add_resource(HealthCheck, '/health-check')
 api.add_resource(Login, '/user/login')
+api.add_resource(TokenRefresh, '/refresh-token')

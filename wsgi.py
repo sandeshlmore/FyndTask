@@ -14,5 +14,5 @@ application = DispatcherMiddleware(None, {
 
 
 if __name__ == '__main__':
-    run_simple('0.0.0.0', 8000, application, use_debugger=True, use_reloader=True, threaded=True)
+    run_simple('0.0.0.0', 8000, application, use_debugger=False, use_reloader=True, threaded=True)
 
