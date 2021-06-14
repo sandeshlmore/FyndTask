@@ -42,18 +42,13 @@ class Movies(Resource):
             return make_response(jsonify({'status': API_ERROR_STATUS, 'errors': str(e)}), 500)
 
 
-    # @jwt_required
+    @jwt_required
     def post(self):
         try:
             is_add = request.json.get('is_add', False)
             is_edit = request.json.get('is_edit', False)
-            is_get = request.json.get('is_get', False) ##I like to use POST for everything!
             is_delete = request.json.get('is_delete', False)
 
-            # has_admin_access = check_admin_access()
-            # if not has_admin_access:
-            #     return make_response(jsonify(
-            #         {'status': API_SUCCESS_STATUS, 'message': 'ACTION_NOT_ALLOWED_TO_NON_ADMIN_USER'}), 200)
             if is_edit:
                 '''
                     ##Edit movie
@@ -117,33 +112,35 @@ class Movies(Resource):
                     return make_response(jsonify(
                         {'status': API_SUCCESS_STATUS, 'message': 'MOVIE_INSERT_OPERATION_FAILED', 'data': movie}), 200)
 
-            elif is_get:
-                '''
-                    search_string: Search movie by name (case insensitive and returns records with partial matches)
-                    filters: Filter movie by genre, director, ratings, etc.  e.g. {'genre':['Comedy', 'Drama']}
-                    page_no: current page number defaults to 1
-                    per_page: maximum records per page defaults to 10 records  [set to 0 for retrieving all records]
-                    sort_on: defaults to field 'imdb_score' 
-                    ascending: 1 or -1 (for descending)
-                '''
-                filters = request.json.get('filters', {})  ## {'genre':['Comedy', 'Drama']} key-value pair where values must be wrap in list
-                page_no = request.json.get('page_no', 1)
-                per_page = request.json.get('per_page', 10)
-                search_string = request.json.get('search_string', None)
-                sort_on = request.json.get('sort_on', 'imdb_score')
-                ascending = request.json.get('ascending', 1)
-                movies = get_movies(filters, search_string, sort_on, ascending, page_no, per_page)
-                return make_response(
-                    jsonify({'status': API_SUCCESS_STATUS, 'message': 'MOVIES_RETRIEVED_SUCCESSFULLY', 'data': movies}),
-                    200)
-
         except Exception as e:
-            # import traceback
-            # traceback.print_exc()
             return make_response(jsonify({'status': API_ERROR_STATUS, 'errors': str(e)}), 500)
 
 
+class MovieSearch(Resource):
+    def post(self):
+        '''
+            search_string: Search movie by name (case insensitive and returns records with partial matches)
+            filters: Filter movie by genre, director, ratings, etc.  e.g. {'genre':['Comedy', 'Drama']}
+            page_no: current page number defaults to 1
+            per_page: maximum records per page defaults to 10 records  [set to 0 for retrieving all records]
+            sort_on: defaults to field 'imdb_score'
+            ascending: 1 or -1 (for descending)
+        '''
+        try:
+            filters = request.json.get('filters', {})  ## {'genre':['Comedy', 'Drama']} key-value pair where values must be wrap in list
+            page_no = request.json.get('page_no', 1)
+            per_page = request.json.get('per_page', 10)
+            search_string = request.json.get('search_string', None)
+            sort_on = request.json.get('sort_on', 'imdb_score')
+            ascending = request.json.get('ascending', 1)
+            movies = get_movies(filters, search_string, sort_on, ascending, page_no, per_page)
+            return make_response(
+                jsonify({'status': API_SUCCESS_STATUS, 'message': 'MOVIES_RETRIEVED_SUCCESSFULLY', 'data': movies}),
+                200)
+        except Exception as e:
+            return make_response(jsonify({'status': API_ERROR_STATUS, 'errors': str(e)}), 500)
 
 
 api.add_resource(Movies, '/movies')
+api.add_resource(MovieSearch, '/movies/search')
 

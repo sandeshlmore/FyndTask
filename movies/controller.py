@@ -24,19 +24,16 @@ def get_movies(filters, search_string=None, sort_on='imdb_score', ascending=1, p
     return {'movies': movies, 'total_results': total_results}
 
 
-@check_admin_access
 def edit_movie(movie_id, movie):
     if '_id' in movie:
         del movie['_id']
     return db.movies.update_one({'_id': ObjectId(movie_id)}, {'$set': {**movie}})
 
 
-@check_admin_access
 def delete_movie(movie_id):
     return db.movies.delete_one({'_id': ObjectId(movie_id)})
 
 
-@check_admin_access
 def add_movie(movie):
     if '_id' in movie:
         del movie['_id']
