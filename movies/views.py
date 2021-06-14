@@ -30,7 +30,7 @@ class Movies(Resource):
             per_page = int(request.args.get('per_page', 10))
             search_string = request.args.get('search_string', None)
             sort_on = request.args.get('sort_on', 'imdb_score')
-            ascending = eval(request.args.get('ascending', 1))
+            ascending = int(request.args.get('ascending', 1))
             filters = {}
             movies = get_movies(filters, search_string, sort_on, ascending, page_no, per_page)
             return make_response(
