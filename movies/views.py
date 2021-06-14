@@ -43,6 +43,7 @@ class Movies(Resource):
 
 
     @jwt_required
+    @check_admin_access
     def post(self):
         try:
             is_add = request.json.get('is_add', False)
@@ -117,6 +118,7 @@ class Movies(Resource):
 
 
 class MovieSearch(Resource):
+    @jwt_required
     def post(self):
         '''
             search_string: Search movie by name (case insensitive and returns records with partial matches)
