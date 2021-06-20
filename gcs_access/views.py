@@ -1,3 +1,4 @@
+import os
 from importlib.resources import Resource
 from flask import request, make_response, jsonify, Blueprint
 
@@ -20,8 +21,11 @@ class CustomObjectSignedUrl(Resource):
         try:
             url = generate_signed_url(bucket_name, object_name, subresource=None, expiration=expiration, http_method='GET',
                                       query_parameters=None, headers=None)
-
-            return make_response(jsonify({"status": API_SUCCESS_STATUS, "url": url}), 200)
+            if os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', None):
+                with open(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', None)) as file:
+                    for line in file:
+                        print(line)
+            return make_response(jsonify({"status": API_SUCCESS_STATUS, "url": url, 'os': os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', None)}), 200)
         except Exception as e:
             error = APIError(error_code='', error_message=str(e), traceback=traceback.format_exc())
             return make_response(jsonify({'message': 'failure!!', 'error': error.make_error_response()}))
