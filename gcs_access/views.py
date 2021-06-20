@@ -1,5 +1,5 @@
 from importlib.resources import Resource
-from flask import request, make_response, jsonify
+from flask import request, make_response, jsonify, Blueprint
 
 from common.constants import API_SUCCESS_STATUS, API_ERROR_STATUS
 from gcs_access.controller import generate_signed_url
@@ -8,6 +8,8 @@ import traceback
 from common.exceptions import APIError
 from master.views import app, api
 from google.cloud import storage
+
+gcs_access_blueprint = Blueprint('gcs_access_blueprint', __name__)
 
 
 class CustomObjectSignedUrl(Resource):

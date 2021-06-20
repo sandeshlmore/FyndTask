@@ -1,12 +1,14 @@
 from werkzeug import run_simple
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 
+from gcs_access.views import gcs_access_blueprint
 from master.views import app
 from movies.views import movies_blueprint
 from user.views import user_blueprint
 
 app.register_blueprint(movies_blueprint)
 app.register_blueprint(user_blueprint)
+app.register_blueprint(gcs_access_blueprint)
 
 application = DispatcherMiddleware(None, {
     '/api': app
