@@ -1,4 +1,6 @@
-
+from google.cloud import storage
+import collections, hashlib, binascii, datetime
+from six.moves.urllib.parse import quote
 
 
 def generate_signed_url(bucket_name, object_name, subresource=None, expiration=604800, http_method='GET',

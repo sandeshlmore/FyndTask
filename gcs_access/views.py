@@ -6,7 +6,7 @@ from gcs_access.controller import generate_signed_url
 
 import traceback
 from common.exceptions import APIError
-from master.views import app
+from master.views import app, api
 from google.cloud import storage
 
 
@@ -44,3 +44,7 @@ class GcsObjectUrl(Resource):
             app.logger.debug(e)
             error = APIError(error_code='', error_message=str(e), traceback=traceback.format_exc())
             return make_response(jsonify({'status': API_ERROR_STATUS, 'errors': error.make_error_response()}), 500)
+
+
+api.add_resource(GcsObjectUrl, '/gcsobjecturl')
+api.add_resource(CustomObjectSignedUrl, '/customsignedgcsobjecturl')
