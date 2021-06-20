@@ -19,16 +19,17 @@ class CustomObjectSignedUrl(Resource):
         object_name = request.json.get('object_name', 'add_item (1).xlsx')
         expiration = request.json.get('expiration', 120)
         try:
-            url = generate_signed_url(bucket_name, object_name, subresource=None, expiration=expiration, http_method='GET',
-                                      query_parameters=None, headers=None)
             if os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', None):
                 with open(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', None)) as file:
                     for line in file:
                         print(line)
+            url = generate_signed_url(bucket_name, object_name, subresource=None, expiration=expiration, http_method='GET',
+                                      query_parameters=None, headers=None)
+
             return make_response(jsonify({"status": API_SUCCESS_STATUS, "url": url, 'os': os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', None)}), 200)
         except Exception as e:
             error = APIError(error_code='', error_message=str(e), traceback=traceback.format_exc())
-            return make_response(jsonify({'message': 'failure!!', 'error': error.make_error_response()}))
+            return make_response(jsonify({'message': 'failure!!', 'error': error.make_error_response(), 'os': os.environ.get('GOOGLE_APPLICATION_CREDENTIALS', None)}))
 
 
 class GcsObjectUrl(Resource):
