@@ -1,5 +1,5 @@
 import os
-from importlib.resources import Resource
+from flask_restful import Resource
 from flask import request, make_response, jsonify, Blueprint
 
 from common.constants import API_SUCCESS_STATUS, API_ERROR_STATUS
